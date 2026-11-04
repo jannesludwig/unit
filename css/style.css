@@ -84,7 +84,11 @@ select {
 .pat.queued { animation: blink 0.25s steps(2) infinite; border-color: var(--accent); }
 @keyframes blink { 50% { border-color: var(--line2); color: var(--dim); } }
 .chainstr { color: var(--accent); min-width: 30px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-.msg { color: var(--accent); min-width: 80px; text-align: right; opacity: 0; transition: opacity 0.4s; }
+.msg {
+  position: absolute; right: 12px; bottom: calc(var(--deck-h) + 36px); z-index: 5; pointer-events: none;
+  color: var(--accent); background: rgba(0, 0, 0, 0.7); padding: 2px 6px; letter-spacing: 0.12em;
+  opacity: 0; transition: opacity 0.4s;
+}
 .msg.on { opacity: 1; transition: none; }
 .rec.on { background: var(--warn); border-color: var(--warn); color: #000; animation: none; }
 .rec.armed { border-color: var(--warn); color: var(--warn); animation: blink 0.4s steps(2) infinite; }
@@ -222,3 +226,15 @@ select {
 #start.gone { display: none; }
 .dropzone { outline: 1px dashed var(--accent); outline-offset: -8px; }
 #bar select { width: 64px; }
+
+/* narrower laptops: tighten the transport bar */
+@media (max-width: 1420px) {
+  #bar { gap: 8px; padding: 0 8px; }
+  #bar .lbl.opt { display: none; }
+  #deck { grid-template-columns: minmax(0, 1fr) 356px 210px; }
+}
+@media (max-width: 1300px) {
+  #bar { gap: 6px; }
+  #bar .sep { display: none; }
+  .pos { min-width: 44px; }
+}

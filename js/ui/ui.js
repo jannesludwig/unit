@@ -72,7 +72,8 @@ export class UI {
     this.buildMacros();
     this.buildHelp();
     this.start = el('div#start', { onclick: () => this.app.ensureAudio() },
-      el('div.logo', { html: 'UNI<b>T</b>' }), el('div.lbl', { text: 'CLICK OR PRESS ANY KEY TO START AUDIO' }));
+      el('div.logo', { html: 'UNI<b>T</b>' }), el('div.lbl', { text: 'CLICK OR PRESS ANY KEY TO START AUDIO' }),
+      el('div.lbl', { text: 'THEN  SPACE = PLAY  ·  ? = HELP', style: { color: 'var(--dim)' } }));
     document.body.append(this.start);
   }
 
@@ -123,7 +124,12 @@ export class UI {
     this.fillBtn = el('button.acc', { text: 'FILL', 'data-tip': 'Fill: hold L (momentary) · click to latch', 'data-key': 'L', onclick: () => a.setFill(!a.seq.fill) });
     this.viewBtn = el('button', { text: 'MIX', 'data-tip': 'Toggle grid / mixer view', 'data-key': 'TAB', onclick: () => this.toggleView() });
     this.demoSel = el('select', { 'data-tip': 'Load a demo project' }, el('option', { value: '', text: 'DEMO' }), ...DEMOS.map((d, i) => el('option', { value: i, text: d.name })));
-    this.demoSel.addEventListener('change', () => { if (this.demoSel.value !== '') { a.loadDemo(+this.demoSel.value); this.msg(DEMOS[+this.demoSel.value].name); } this.demoSel.value = ''; this.demoSel.blur(); });
+    this.demoSel.addEventListener('change', () => {
+      const v = this.demoSel.value;
+      if (v === 'new') { a.newProject(); this.msg('NEW PROJECT'); }
+      else if (v !== '') { a.loadDemo(+v); this.msg(DEMOS[+v].name); }
+      this.demoSel.value = ''; this.demoSel.blur();
+    });
     this.ioGrp = el('div.grp');   // filled by export module (WAV / VIDEO / SAVE / LOAD)
     this.msgEl = el('span.msg');
     this.helpBtn = el('button', { text: '?', 'data-tip': 'Help & shortcuts', 'data-key': '?', onclick: () => this.toggleHelp() });
@@ -131,7 +137,7 @@ export class UI {
     this.bar.append(
       el('div.grp', {}, this.playBtn), el('div.grp', {}, this.bpmEl, el('span.lbl', { text: 'BPM' })),
       el('div.grp', {}, el('span.lbl', { text: 'SW' }), this.swEl), this.posEl, sep(),
-      el('div.grp', {}, el('span.lbl', { text: 'PAT' }), ...this.patBtns), el('div.grp', {}, el('span.lbl', { text: 'BARS' }), ...this.barsBtns),
+      el('div.grp', {}, el('span.lbl.opt', { text: 'PAT' }), ...this.patBtns), el('div.grp', {}, el('span.lbl', { text: 'BARS' }), ...this.barsBtns),
       el('div.grp', {}, this.chainBtn, this.chainStr), sep(),
       el('div.grp', {}, el('span.lbl', { text: 'PAGE' }), ...this.pageBtns, this.followBtn), sep(),
       this.fillBtn, el('span.spacer'), this.msgEl, this.ioGrp, sep(), this.demoSel, this.viewBtn, this.helpBtn,
@@ -791,7 +797,7 @@ export class UI {
           KeyD: () => this.reroll(),
           KeyF: () => this.toggleFull(),
           KeyW: () => a.io?.toggleWav(),
-          KeyV: () => a.io?.toggleVideo(),
+          KeyO: () => a.io?.toggleVideo(),
         });
       }
       const f = act[code];
@@ -842,7 +848,7 @@ export class UI {
         el('div', {},
           sec('TRANSPORT', [['SPACE', 'play / stop'], ['− / =', 'tempo −1 / +1 (⇧ ±10)'], ['[ / ]', 'swing −1 / +1'], ['L (hold)', 'fill while held'], ['⇧L', 'latch fill']]),
           sec('PATTERNS', [['Z X C V', 'pattern A B C D (queued while playing)'], ['⇧Z…V', 'copy current pattern there'], ['⌥Z…V', 'append to chain'], ['B / ⇧B', 'chain on/off · clear chain'], ['← / →', 'page (bar 1–4)']]),
-          sec('FILE', [['⌘S', 'save project (.json)'], ['⌘O', 'open project'], ['⇧W', 'record WAV'], ['⇧V', 'record video'], ['⌘Z / ⇧⌘Z', 'undo / redo'], ['drop file', 'load project']])),
+          sec('FILE', [['⌘S', 'save project (.json)'], ['⌘O', 'open project'], ['⇧W', 'record WAV'], ['⇧O', 'record video'], ['⌘Z / ⇧⌘Z', 'undo / redo'], ['drop file', 'load project']])),
         el('div', {},
           sec('TRACKS & STEPS', [['↑ / ↓  ⇧1…8', 'select track'], ['Q…I  A…K', 'steps 1–16: tap = toggle'], ['hold key + knob', 'parameter lock'], ['long-press / ⇧click', 'select step(s) for locks'], ['ESC', 'leave step edit'], ['M / N', 'mute / solo track'], [', / .', 'previous / next preset'], ['TAB', 'grid ↔ mixer']]),
           sec('GENERATORS', [['⇧E', 'write Euclid rhythm'], ['⇧M', 'bake mutation'], ['⇧R', 'random pattern'], ['⇧D', 're-roll DÉJÀ VU'], ['⌘C / ⌘V', 'copy / paste track'], ['⌫', 'clear track']])),

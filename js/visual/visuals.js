@@ -120,14 +120,42 @@ export class VisualEngine {
     app.on('pattern', () => {
       if (this.app.project.visual.auto) this.setScene((this.cur + 1) % SCENE_CLASSES.length);
     });
-    app.on('audio', () => {
-      this.features.setup();
-      const ctx = app.engine.ctx;
-      // visuals fire when the hit leaves the speakers, not when it is rendered
-      app.seq.avOffset = (ctx.outputLatency || ctx.baseLatency || 0) + 0.006;
-    });
+    app.on('audio', () => this.onAudio());
     app.on('project', () => { this.setScene(app.project.visual.scene | 0, true); });
     this.ensureScene(this.cur);
+    if (app.engine.ready) this.onAudio();
+    this.warmup();
+  }
+
+  /**
+   * Build every scene once and render a frame into its target so all shaders are compiled
+   * up front: a first switch to a scene during playback then never stalls the main thread
+   * (and with it the audio scheduler).
+   */
+  warmup() {
+    const todo = SCENE_CLASSES.map((_, i) => i).filter((i) => i !== this.cur);
+    const next = () => {
+      const i = todo.shift();
+      if (i === undefined) return;
+      try {
+        const s = this.ensureScene(i);
+        const F = this.frameState(1 / 60);
+        F.params = this.app.project.visual.params[i];
+        s.update(F);
+        s.render(this.sceneRT[i]);
+      } catch (e) { console.warn('scene warmup failed', i, e); }
+      setTimeout(next, 30);
+    };
+    setTimeout(next, 50);
+  }
+
+  /** Audio graph is up: attach analysis and compensate output latency for event sync. */
+  onAudio() {
+    if (this.features.ready) return;
+    this.features.setup();
+    const ctx = this.app.engine.ctx;
+    // visuals fire when the hit leaves the speakers, not when it is rendered
+    this.app.seq.avOffset = (ctx.outputLatency || ctx.baseLatency || 0) + 0.006;
   }
 
   get count() { return SCENE_CLASSES.length; }

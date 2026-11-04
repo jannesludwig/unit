@@ -94,7 +94,7 @@ export class AudioEngine {
     const Tone = window.Tone;
     if (Tone) {
       Tone.setContext(ctx, true);
-      Tone.getContext().lookAhead = 0.1;
+      Tone.getContext().lookAhead = 0.12; // headroom against main-thread jank (visuals, GC)
     }
     try { await ctx.audioWorklet.addModule(workletURL()); this.hasWorklet = true; }
     catch (e) { console.warn('AudioWorklet unavailable — crusher/recorder disabled', e); this.hasWorklet = false; }
