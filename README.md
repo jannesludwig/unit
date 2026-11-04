@@ -129,7 +129,8 @@ js/audio/
   voices.js           the 8 voices (params, presets, ENTROPY weights, play())
   dsp.js              SVF, polyBLEP, crusher, curves, buffer cache
   fx.js               delay, reverb
-  worklets.js         crusher + recorder AudioWorklet processors (Blob URL)
+  processors.js       AudioWorklet processors: bit/rate crusher, sample-accurate recorder
+  worklets.js         worklet module URL
 js/seq/
   model.js            project / pattern / step model, (de)serialisation
   sequencer.js        clock, conditions, DÉJÀ VU, MUTATE, ENTROPY, p-locks

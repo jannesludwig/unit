@@ -106,6 +106,8 @@ offset for nudge.
   At **0** the randomness is fresh on every pass. At **100** it is a locked loop: the same
   "random" variation repeats exactly, in step with the track length. Values in between evolve
   slowly. **↻ DV** rolls a new memory.
+  At 100 a 50 % step plays either always or never, depending on the memory. Roll a new
+  memory to hear a different frozen variation.
 - **RND** writes a sparse random pattern. **COPY / PASTE / CLEAR** act on the track's pattern.
 
 ---

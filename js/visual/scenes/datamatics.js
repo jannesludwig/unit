@@ -102,7 +102,7 @@ export class Datamatics {
     this.V = V;
     this.hist = new Float32Array(P * HIST * 4);
     this.histTex = new THREE.DataTexture(this.hist, P, HIST, THREE.RGBAFormat, THREE.FloatType);
-    this.histTex.minFilter = THREE.LinearFilter; this.histTex.magFilter = THREE.LinearFilter;
+    this.histTex.minFilter = THREE.NearestFilter; this.histTex.magFilter = THREE.NearestFilter; // float linear is optional
     this.histTex.wrapT = THREE.RepeatWrapping;
     this.histTex.needsUpdate = true;
     this.head = 0; this.acc = 0;

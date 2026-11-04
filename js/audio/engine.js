@@ -223,7 +223,7 @@ export class AudioEngine {
     const g = this.duckBus.gain, floor = 1 - amt * 0.85;
     const beat = 60 / this.bpm;
     g.cancelScheduledValues(t);
-    g.setTargetAtTime(floor, t, 0.0015);
+    g.setTargetAtTime(floor, t, 0.003);
     g.setTargetAtTime(1, t + 0.012, beat * (0.05 + amt * 0.08));
   }
 

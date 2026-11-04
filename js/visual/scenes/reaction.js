@@ -42,12 +42,21 @@ void main() {
 
 const VIEW = /* glsl */ `
 uniform sampler2D uS;
+uniform vec2 uSize;
 uniform vec3 uFg, uAccent;
 uniform float uPulse, uCont;
 varying vec2 vUv;
 float iso(float v, float t) { float d = abs(v - t) / max(fwidth(v), 1e-4); return 1.0 - smoothstep(0.4, 1.4, d); }
+// manual bilinear: the state is a nearest-sampled float texture (float linear filtering is optional
+// in WebGL2), but the iso-lines need a smooth field
+float sampleV(vec2 uv) {
+  vec2 p = uv * uSize - 0.5, f = fract(p), b = (floor(p) + 0.5) / uSize, t = 1.0 / uSize;
+  float a = texture2D(uS, b).g, c = texture2D(uS, b + vec2(t.x, 0.0)).g;
+  float d = texture2D(uS, b + vec2(0.0, t.y)).g, e = texture2D(uS, b + t).g;
+  return mix(mix(a, c, f.x), mix(d, e, f.x), f.y);
+}
 void main() {
-  float v = texture2D(uS, vUv).g;
+  float v = sampleV(vUv);
   float a = iso(v, 0.22);
   float b = iso(v, 0.12) * 0.35;
   float c = iso(v, 0.32) * 0.25;
@@ -67,7 +76,7 @@ export class ReactionDiffusion {
     this.V = V;
     this.simU = { uS: { value: null }, uTx: { value: new THREE.Vector2() }, uF: { value: 0.0545 }, uK: { value: 0.062 }, uNoise: { value: 0 }, uTime: { value: 0 }, uSeed: { value: [...Array(12)].map(() => new THREE.Vector4()) } };
     this.sim = new Pass(SIM, this.simU);
-    this.view = new Pass(VIEW, { uS: { value: null }, uFg: { value: V.palette.fg }, uAccent: { value: V.palette.accent }, uPulse: { value: 0 }, uCont: { value: 1 } });
+    this.view = new Pass(VIEW, { uS: { value: null }, uSize: { value: new THREE.Vector2(1, 1) }, uFg: { value: V.palette.fg }, uAccent: { value: V.palette.accent }, uPulse: { value: 0 }, uCont: { value: 1 } });
     this.seeds = []; this.noise = 0; this.pulse = 0; this.drift = 0;
     this.f = 0.0545; this.k = 0.062;
   }
@@ -78,8 +87,9 @@ export class ReactionDiffusion {
     this.W = W; this.H = H;
     const r = this.V.renderer;
     if (this.state) this.state.dispose();
-    this.state = new PingPong(r, W, H, { type: stateType(r), wrap: THREE.RepeatWrapping });
+    this.state = new PingPong(r, W, H, { type: stateType(r), wrap: THREE.RepeatWrapping, nearest: true });
     this.simU.uTx.value.set(1 / W, 1 / H);
+    this.view.uniforms.uSize.value.set(W, H);
     // initial: u = 1, v = 0 with a scatter of seed squares
     const d = new Float32Array(W * H * 4);
     for (let i = 0; i < W * H; i++) { d[i * 4] = 1; d[i * 4 + 3] = 1; }

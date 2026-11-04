@@ -224,7 +224,7 @@ const CLICK = {
 // ---------------------------------------------------------------------------------------
 const HAT_RATIOS = [1, 1.483, 1.8, 2.546, 2.63, 3.897];
 const HAT = {
-  id: 'hat', name: 'HAT', level: 0.32,
+  id: 'hat', name: 'HAT', level: 0.36,
   params: [
     { id: 'tone', name: 'TONE', min: 0, max: 1, def: 0.5 },
     { id: 'decay', name: 'DECAY', min: 0.005, max: 0.6, curve: 'exp', unit: 's', def: 0.04 },
@@ -278,7 +278,7 @@ const HAT = {
 // 5 NOISE — gated white-noise blocks, sample-rate reduction, LP/BP/HP SVF.
 // ---------------------------------------------------------------------------------------
 const NOISE = {
-  id: 'noise', name: 'NOISE', level: 0.28,
+  id: 'noise', name: 'NOISE', level: 0.34,
   params: [
     { id: 'type', name: 'TYPE', list: ['LP', 'BP', 'HP'], def: 'BP' },
     { id: 'cutoff', name: 'CUTOFF', min: 60, max: 16000, curve: 'exp', unit: 'Hz', def: 3000 },
@@ -323,7 +323,7 @@ const NOISE = {
 // 6 TONE — 2-operator FM sine, short and exact.
 // ---------------------------------------------------------------------------------------
 const TONE = {
-  id: 'tone', name: 'TONE', mono: false, level: 0.32,
+  id: 'tone', name: 'TONE', mono: false, level: 0.42,
   params: [
     { id: 'pitch', name: 'PITCH', min: 28, max: 84, step: 1, unit: 'note', def: 48 },
     { id: 'fm', name: 'FM', min: 0, max: 1, def: 0.15 },
