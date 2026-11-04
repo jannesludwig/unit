@@ -82,8 +82,13 @@ export class AudioEngine {
     this.bpm = 120;
   }
 
-  async init() {
-    if (this.ready) return;
+  /** Build the audio graph once (concurrent callers share the same promise). */
+  init() {
+    if (!this._initP) this._initP = this._init();
+    return this._initP;
+  }
+
+  async _init() {
     const ctx = new AudioContext({ latencyHint: 'interactive' });
     this.ctx = ctx;
     const Tone = window.Tone;
@@ -161,6 +166,27 @@ export class AudioEngine {
   }
 
   get now() { return this.ctx.currentTime; }
+
+  /** Peak level of a strip (post-fader) for the mixer meters; analysers are created lazily. */
+  stripLevel(i) {
+    if (!this._meters) {
+      this._mbuf = new Float32Array(256);
+      this._meters = this.strips.map((s) => {
+        const a = this.ctx.createAnalyser(); a.fftSize = 256;
+        s.mute.connect(a); a.connect(this.sink);
+        return a;
+      });
+    }
+    return this.peak(this._meters[i]);
+  }
+  masterLevel() { return this.peak(this.analyser); }
+  peak(an) {
+    const b = this._mbuf || (this._mbuf = new Float32Array(256));
+    an.getFloatTimeDomainData(b);
+    let m = 0;
+    for (let k = 0; k < b.length; k++) { const v = Math.abs(b[k]); if (v > m) m = v; }
+    return m;
+  }
 
   /** Resolve normalised params (+locks/jitter) into real units for a voice. */
   resolve(i, n) {

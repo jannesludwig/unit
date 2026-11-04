@@ -141,7 +141,6 @@ function droneClicks() {
   seq(A, 'tone', '.....x...........x.......x......', { steps: { 5: { p: 0.6 }, 17: { p: 0.5, l: { pitch: 76 } }, 25: { p: 0.4 } } });
   seq(A, 'data', '..........x.................x...', { steps: { 10: { p: 0.5 }, 28: { r: 2, p: 0.6 } } });
   seq(A, 'drone', 'x.......', { speed: 0.25, len: 8, steps: { 4: { l: { pitch: 31 } } } });
-  A.tracks[T.drone].steps[4] = A.tracks[T.drone].steps[4] || newStep();
   p.visual.scene = 2;
   return p;
 }

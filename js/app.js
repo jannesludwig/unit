@@ -32,9 +32,10 @@ export class App extends Emitter {
   /** Audio needs a user gesture: build the graph on first interaction. */
   async ensureAudio() {
     if (!this.engine.ready) {
-      await this.engine.init();
-      this.applyProject();
-      this.emit('audio');
+      if (!this._audioP) {
+        this._audioP = this.engine.init().then(() => { this.applyProject(); this.emit('audio'); });
+      }
+      await this._audioP;
     }
     if (this.engine.ctx.state !== 'running') await this.engine.ctx.resume();
   }
