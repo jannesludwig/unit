@@ -96,7 +96,7 @@ export class Features {
     for (let b = 0; b < NBANDS; b++) {
       let m = -160;
       for (let k = ed[b]; k <= Math.max(ed[b], ed[b + 1] - 1); k++) if (fft[k] > m) m = fft[k];
-      const v = clamp((m + 92) / 72);
+      const v = clamp((m + 96) / 84);
       sp[b] = v > sp[b] ? v : sp[b] + (v - sp[b]) * (1 - Math.exp(-dt * 10));
       this.spectrumPeak[b] = Math.max(v, this.spectrumPeak[b] - dt * 0.4);
     }

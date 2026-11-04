@@ -63,7 +63,7 @@ export function newProject() {
     cur: 0,
     chain: [0],
     chainOn: false,
-    visual: { scene: 0, reactivity: 0.75, auto: false, params: [[0.0, 0.6, 0.5], [0.6, 0.5, 0.5], [0.6, 0.4, 0.2], [0.5, 0.35, 0.6], [0.3, 0.5, 0.4]] },
+    visual: { scene: 0, reactivity: 0.75, auto: false, params: [[0.0, 0.6, 0.5], [0.6, 0.55, 0.5], [0.85, 0.5, 0.15], [0.5, 0.35, 0.6], [0.0, 0.45, 0.4]] },
   };
 }
 

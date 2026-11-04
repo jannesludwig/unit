@@ -40,6 +40,15 @@ export function rtType(renderer) {
   return floatType;
 }
 
+let fullFloat = null;
+/** FloatType when 32-bit float targets are renderable (needed for particle state), else half. */
+export function stateType(renderer) {
+  if (fullFloat) return fullFloat;
+  const gl = renderer.getContext();
+  fullFloat = renderer.capabilities.isWebGL2 && gl.getExtension('EXT_color_buffer_float') ? THREE.FloatType : rtType(renderer);
+  return fullFloat;
+}
+
 export function makeRT(renderer, w, h, opts = {}) {
   return new THREE.WebGLRenderTarget(Math.max(1, w | 0), Math.max(1, h | 0), {
     type: opts.type || rtType(renderer),

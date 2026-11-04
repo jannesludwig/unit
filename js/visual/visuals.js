@@ -13,9 +13,13 @@
 import { THREE, Pass, makeRT, PingPong, GLSL } from './gl.js';
 import { Features } from './features.js';
 import { Oscilloscope } from './scenes/oscilloscope.js';
+import { Datamatics } from './scenes/datamatics.js';
+import { CymaticSphere } from './scenes/cymatic.js';
+import { Signal } from './scenes/signal.js';
+import { ReactionDiffusion } from './scenes/reaction.js';
 import { clamp, lerp } from '../core/util.js';
 
-export const SCENE_CLASSES = [Oscilloscope];
+export const SCENE_CLASSES = [Oscilloscope, Datamatics, CymaticSphere, Signal, ReactionDiffusion];
 
 const COMP_FRAG = /* glsl */ `
 uniform sampler2D uA, uB; uniform float uMix;
@@ -177,11 +181,11 @@ export class VisualEngine {
     const dark = new THREE.Color('#3f6f8a'), mid = new THREE.Color('#5ccfff'), cold = new THREE.Color('#b9f1ff');
     const a = this.palette.accent;
     if (mood < 0.5) a.copy(dark).lerp(mid, mood * 2); else a.copy(mid).lerp(cold, (mood - 0.5) * 2);
-    this.palette.fg.setScalar(lerp(0.78, 1.0, clamp(mood * 1.4)));
+    this.palette.fg.setScalar(lerp(0.84, 1.0, clamp(mood * 1.4)));
     const u = this.final.uniforms;
-    u.uContrast.value = lerp(0.92, 1.18, mood);
-    u.uGamma.value = lerp(1.18, 0.92, mood);
-    u.uExposure.value = lerp(0.9, 1.05, mood);
+    u.uContrast.value = lerp(0.95, 1.15, mood);
+    u.uGamma.value = lerp(1.1, 0.92, mood);
+    u.uExposure.value = lerp(0.95, 1.05, mood);
   }
 
   /** Frame-state shared by all scenes. */
@@ -231,7 +235,8 @@ export class VisualEngine {
       const tu = this.trailPass.uniforms;
       tu.uCur.value = this.compRT.texture;
       tu.uPrev.value = this.trail.read.texture;
-      tu.uDecay.value = clamp(Math.pow(p.macros.space, 1.3) * 0.9, 0, 0.93);
+      // per-frame decay normalised to 60 fps so trails last the same time at any frame rate
+      tu.uDecay.value = Math.pow(clamp(Math.pow(p.macros.space, 1.3) * 0.9, 0, 0.93), dt * 60);
       tu.uDrift.value.set(0, p.macros.space * 0.0006);
       this.trailPass.render(r, this.trail.write);
       this.trail.swap();
