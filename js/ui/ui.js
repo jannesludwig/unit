@@ -660,7 +660,14 @@ export class UI {
     this.sceneBtns.forEach((b, i) => b.classList.toggle('on', i === v.scene));
     this.sceneName.textContent = String(v.scene + 1).padStart(2, '0') + ' ' + SCENE_NAMES[v.scene];
     const names = this.app.visual?.paramNames(v.scene) || ['P1', 'P2', 'P3'];
-    this.sceneKnobs.forEach((k, i) => { k.setLabel(names[i]); k.set(v.params[v.scene][i]); });
+    const meta = this.app.visual?.paramMeta(v.scene) || {};
+    this.sceneKnobs.forEach((k, i) => {
+      k.setLabel(names[i]);
+      k.o.steps = meta.steps?.[i] || 0;
+      k.o.format = meta.formats?.[i] || pct;
+      k.root.dataset.tip = `${SCENE_NAMES[v.scene]} · ${names[i]}`;
+      k.set(v.params[v.scene][i]); k.render();
+    });
     this.reactKnob.set(v.reactivity);
     this.autoBtn.classList.toggle('on', !!v.auto);
     this.freezeBtn.classList.toggle('on', !!this.app.visual?.frozen);
